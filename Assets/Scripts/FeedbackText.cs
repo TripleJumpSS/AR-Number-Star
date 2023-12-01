@@ -31,13 +31,13 @@ public class FeedbackText : MonoBehaviour
     {
         DisplayFeedback = true; //Setting this to true lets the timer run.
         Timer = 2; //Sets the timer to 2 seconds, after which the text will be blank.
-        gameObject.GetComponent<TMP_Text>().text = "Good Job!"; //Sets text to display "Good Job!"
+        gameObject.GetComponent<TMP_Text>().text = "Good Job"; //Sets text to display "Good Job!"
     }
 
     public void TryAgain() //Displays "Try Again..." for 2 seconds, then clears text.
     {
         DisplayFeedback = true; //Setting this to true lets the timer run.
         Timer = 2; //Sets the timer to 2 seconds, after which the text will be blank.
-        gameObject.GetComponent<TMP_Text>().text = "Try Again..."; //Sets text to display "Try Again..."
+        gameObject.GetComponent<TMP_Text>().text = "Try Again"; //Sets text to display "Try Again..."
     }
 }
