@@ -11,15 +11,15 @@ public class GameManager : MonoBehaviour
     public List<int> RemainingNumbers; //A list containing every number the player can still roll.
     public GameObject BalloonParent; //An object that shifts the balloon position every time the player 'ChoseRight'.
     public GameObject Camera; //Camera checks if player is looking at the balloon before allowing them to choose an answer.
-    public GameObject PopManager;
+    public GameObject PopManager; //Instantiates a firework particle effect at the balloon's location when it pops.
     
     [Header("Score")]
     public int Score; //Goes up every time the player chooses right.
     public TMP_Text ScoreText; //Displays Score.
     public GameObject FeedbackText; //Displays "Good Job!" when correct, "Try Again..." when wrong. [See: FeedbackText.cs]
-    public bool[] ListOfErrors;
-    public TMP_Text FinalPercentageText;
-    int HowManyWrong;
+    public bool[] ListOfErrors; //An array of Booleans, one for each question. When the player gets a question wrong, that question is marked as True.
+    int HowManyWrong; //Checks how many booleans in ListOfErrors are true. 
+    public TMP_Text FinalPercentageText; //Uses HowManyWrong to calcuate what percentage of questions they got wrong.
 
     [Header("Interactive UI")]
     public TMP_Text RightNumberText; //The button that displays the correct number.
@@ -29,15 +29,15 @@ public class GameManager : MonoBehaviour
     public GameObject WinScreen; //Is enabled when game is cleared. Displays score and replay button.
     [Header("Audio")]
     public GameObject AudioManager; //Contains all the sound effects.
-    public GameObject LanuageManager;
-    public int LanuageValue;
+    public GameObject LanuageManager; //Contains what language the player chooses at the start.
+    public int LanuageValue;//The language that the player chose. 0 is English, 2 is French, 3 is Spanish, 4 is Italian. 
     public GameObject[] NumberVOManager; //Contains all the voice-overs which introduce the numbers.
     public GameObject[] FeedbackVOManager; //Contains all the voice-overs which occur when the player chooses right or wrong.
     public void StartTheGame()
     {
         RollNewNumber(); //Randomises CorrectNumber immediately.
-        LanuageValue = LanuageManager.GetComponent<LanuageToggle>().LanuageValue;
-        StartCoroutine(BalloonSpotted());
+        LanuageValue = LanuageManager.GetComponent<LanuageToggle>().LanuageValue; //Checks which language the player chose at the start.
+        StartCoroutine(BalloonSpotted()); //Starts Round 1 with it's respective voice clip.
     } 
 
     void RollNewNumber() //Rolls (aka Randomises) the CorrectNumber every time the player 'ChoseRight'.
@@ -58,11 +58,8 @@ public class GameManager : MonoBehaviour
     //The following two methods are triggered when you tap a button.
     public void ChoseRight() //Triggered when correct number is tapped.
     {  
-        if(RemainingNumbers.Count == 0) //When the game is won:
-        {
-            Victory();
-            return;
-        } 
+        if(RemainingNumbers.Count == 0) //When the game is won, play victory sequence.
+        {Victory(); return;}
 
         Score += 1; //Increases Score counter by 1.
         ScoreText.text = Score.ToString() + "/10"; //Displays score count in UI textbox. 
@@ -75,7 +72,7 @@ public class GameManager : MonoBehaviour
 
         BalloonParent.GetComponent<ChangeBalloonColour>().ChangeBalloonHue(); //Changes the balloon to the next colour. [See: ChangeBalloonHue.cs]
         Camera.GetComponent<CheckIfFacingBalloon>().LookingForNextBalloon = true; //Alerts CheckIfFacingBalloon to go off when the player sees the next balloon.
-        StartCoroutine(PopManager.GetComponent<PopManager>().Pop());
+        StartCoroutine(PopManager.GetComponent<PopManager>().Pop()); //Sets off fireworks at the balloon location. [See: PopManager.cs]
 
         RollNewNumber(); //Randomises CorrectNumber for the next round.
 
@@ -99,13 +96,13 @@ public class GameManager : MonoBehaviour
         FeedbackText.GetComponent<FeedbackText>().TryAgain(); //Aknowledges the player's failure with a "Try Again..." [See: FeedbackText.cs]
         AudioManager.GetComponent<AudioManager>().PlayBad(); //Play the failure sound. [See: SoundManager.cs]
         FeedbackVOManager[LanuageValue].GetComponent<FeedbackVOManager>().VORepremand(); //Audibly chastises the player for their failure.
-        ListOfErrors[CorrectNumber - 1] = true;
+        ListOfErrors[CorrectNumber - 1] = true; //Marks the current question as Incorrect for the winscreen's percentage.
     }
 
     public IEnumerator BalloonSpotted()
     {
-        StartCoroutine(NumberVOManager[LanuageValue].GetComponent<NumberVOManager>().VOIntroduceNumber(CorrectNumber));
-        if(LanuageValue == 2){yield return new WaitForSeconds(10);}
+        StartCoroutine(NumberVOManager[LanuageValue].GetComponent<NumberVOManager>().VOIntroduceNumber(CorrectNumber)); //Plays the "This is the number X. Say X." voice clip of your chosen language.
+        if(LanuageValue == 2){yield return new WaitForSeconds(10);} //Pause to allow the player to say it outloud. Spanish VO is slower, so the pause is 10 seconds for spanish, 8 seconds for the others.
         else{yield return new WaitForSeconds(8);}
         UIBottomBar.SetActive(true); //Enables the buttons after the player has seen the balloon.
         
@@ -120,13 +117,13 @@ public class GameManager : MonoBehaviour
 
         
 
-        foreach (bool Fail in ListOfErrors)
+        foreach (bool Fail in ListOfErrors) //Tallying the player's final grade percentage.
         {
-            if(Fail){HowManyWrong += 1;}
+            if(Fail){HowManyWrong += 1;} //Every question marked incorrect is counted.
         }
-        int FinalPercentage = Mathf.Abs(10 * (HowManyWrong - 10));
+        int FinalPercentage = Mathf.Abs(10 * (HowManyWrong - 10)); //Percentage is calculated by taking away failures from the total number of questions times ten. We use Mathf.Abs so the number is positive.
 
-        FinalPercentageText.text = "(" + FinalPercentage.ToString() + "%)";
+        FinalPercentageText.text = "(" + FinalPercentage.ToString() + "%)"; //Display percentage as text on the winscreen.
 
 
     }

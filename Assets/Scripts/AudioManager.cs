@@ -15,5 +15,5 @@ public class AudioManager : MonoBehaviour
     public void PlayBad() //Plays fail sound.
     {Bad.Play();}
     public void PlayGameClear()
-    {Win.Play(); Applause.Play();;} //Plays victory sound. Makes it slightly more high-pitched every success.
+    {Win.Play(); Applause.Play();;} //Plays final victory sound for winning the game.
 }
