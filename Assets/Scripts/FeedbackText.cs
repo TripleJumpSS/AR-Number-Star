@@ -7,6 +7,8 @@ public class FeedbackText : MonoBehaviour
 {
     public float Timer; //Decreases when text is displayed. Clears text when zero.
     public bool DisplayFeedback; //Is only true when text is to be displayed.
+    public int LanuageValue;
+    public GameObject GameManager;
     
     void Start() //Clears text to start.
     {
@@ -29,15 +31,33 @@ public class FeedbackText : MonoBehaviour
     //The following two methods are triggered by the GameManager script when you tap a button.
     public void GoodJob() //Displays "Good Job!" for 2 seconds, then clears text.
     {
+        LanuageValue = GameManager.GetComponent<GameManager>().LanuageValue;
         DisplayFeedback = true; //Setting this to true lets the timer run.
         Timer = 2; //Sets the timer to 2 seconds, after which the text will be blank.
-        gameObject.GetComponent<TMP_Text>().text = "Good Job"; //Sets text to display "Good Job!"
+
+        switch (LanuageValue)
+        {
+            case 0: gameObject.GetComponent<TMP_Text>().text = "Good Job"; break; //Sets text to display "Good Job!"
+            case 1: gameObject.GetComponent<TMP_Text>().text = "Bon Travail"; break; //Sets text to display "Good Job!"
+            case 2: gameObject.GetComponent<TMP_Text>().text = "Buen Trabajo"; break; //Sets text to display "Good Job!"
+            case 3: gameObject.GetComponent<TMP_Text>().text = "Ottimo Lavoro"; break; //Sets text to display "Good Job!"
+            default: print("invalid langvalue in feedback text"); break;
+        }
     }
 
     public void TryAgain() //Displays "Try Again..." for 2 seconds, then clears text.
     {
+        LanuageValue = GameManager.GetComponent<GameManager>().LanuageValue;
         DisplayFeedback = true; //Setting this to true lets the timer run.
         Timer = 2; //Sets the timer to 2 seconds, after which the text will be blank.
-        gameObject.GetComponent<TMP_Text>().text = "Try Again"; //Sets text to display "Try Again..."
+
+        switch (LanuageValue)
+        {
+            case 0: gameObject.GetComponent<TMP_Text>().text = "Try Again"; break; //Sets text to display "Good Job!"
+            case 1: gameObject.GetComponent<TMP_Text>().text = "Réessayer"; break; //Sets text to display "Good Job!"
+            case 2: gameObject.GetComponent<TMP_Text>().text = "Inténtalo De Nuevo"; break; //Sets text to display "Good Job!"
+            case 3: gameObject.GetComponent<TMP_Text>().text = "Riprova"; break; //Sets text to display "Good Job!"
+            default: print("invalid langvalue in feedback text"); break;
+        }
     }
 }

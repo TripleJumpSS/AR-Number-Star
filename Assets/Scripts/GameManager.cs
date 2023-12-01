@@ -29,11 +29,14 @@ public class GameManager : MonoBehaviour
     public GameObject WinScreen; //Is enabled when game is cleared. Displays score and replay button.
     [Header("Audio")]
     public GameObject AudioManager; //Contains all the sound effects.
-    public GameObject NumberVOManager; //Contains all the voice-overs which introduce the numbers.
-    public GameObject FeedbackVOManager; //Contains all the voice-overs which occur when the player chooses right or wrong.
+    public GameObject LanuageManager;
+    public int LanuageValue;
+    public GameObject[] NumberVOManager; //Contains all the voice-overs which introduce the numbers.
+    public GameObject[] FeedbackVOManager; //Contains all the voice-overs which occur when the player chooses right or wrong.
     public void StartTheGame()
     {
         RollNewNumber(); //Randomises CorrectNumber immediately.
+        LanuageValue = LanuageManager.GetComponent<LanuageToggle>().LanuageValue;
         StartCoroutine(BalloonSpotted());
     } 
 
@@ -68,7 +71,7 @@ public class GameManager : MonoBehaviour
         AudioManager.GetComponent<AudioManager>().PlayPop(); //Play the balloon pop sound. [See: SoundManager.cs]
 
         FeedbackText.GetComponent<FeedbackText>().GoodJob(); //Celebrates the player's success with a "Good Job!" [See: FeedbackText.cs]
-        FeedbackVOManager.GetComponent<FeedbackVOManager>().VOPraise(); //Audibly cheers on the player for their success.
+        FeedbackVOManager[LanuageValue].GetComponent<FeedbackVOManager>().VOPraise(); //Audibly cheers on the player for their success.
 
         BalloonParent.GetComponent<ChangeBalloonColour>().ChangeBalloonHue(); //Changes the balloon to the next colour. [See: ChangeBalloonHue.cs]
         Camera.GetComponent<CheckIfFacingBalloon>().LookingForNextBalloon = true; //Alerts CheckIfFacingBalloon to go off when the player sees the next balloon.
@@ -95,14 +98,15 @@ public class GameManager : MonoBehaviour
     {
         FeedbackText.GetComponent<FeedbackText>().TryAgain(); //Aknowledges the player's failure with a "Try Again..." [See: FeedbackText.cs]
         AudioManager.GetComponent<AudioManager>().PlayBad(); //Play the failure sound. [See: SoundManager.cs]
-        FeedbackVOManager.GetComponent<FeedbackVOManager>().VORepremand(); //Audibly chastises the player for their failure.
+        FeedbackVOManager[LanuageValue].GetComponent<FeedbackVOManager>().VORepremand(); //Audibly chastises the player for their failure.
         ListOfErrors[CorrectNumber - 1] = true;
     }
 
     public IEnumerator BalloonSpotted()
     {
-        StartCoroutine(NumberVOManager.GetComponent<NumberVOManager>().VOIntroduceNumber(CorrectNumber));
-        yield return new WaitForSeconds(8);
+        StartCoroutine(NumberVOManager[LanuageValue].GetComponent<NumberVOManager>().VOIntroduceNumber(CorrectNumber));
+        if(LanuageValue == 2){yield return new WaitForSeconds(10);}
+        else{yield return new WaitForSeconds(8);}
         UIBottomBar.SetActive(true); //Enables the buttons after the player has seen the balloon.
         
     }
@@ -110,7 +114,8 @@ public class GameManager : MonoBehaviour
     {
         NumberBalloonText.text = ";)"; //Changes the number on the balloon to a winking face if the player clears the game.
         ScoreText.text = "YAY"; //Changes the number on the balloon to a winking face if the player clears the game.
-        FeedbackVOManager.GetComponent<FeedbackVOManager>().VOPraise(); //One last voice line to celebrate the player;
+        FeedbackVOManager[LanuageValue].GetComponent<FeedbackVOManager>().VOPraise(); //One last voice line to celebrate the player;
+        AudioManager.GetComponent<AudioManager>().PlayGameClear(); //Play the win sound. [See: SoundManager.cs]
         WinScreen.SetActive(true); //Enables win screen, displaying the player's score and allowing them to replay the level. 
 
         
